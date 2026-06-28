@@ -1,4 +1,4 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, field_validator
 from typing import Optional, List
 from datetime import datetime
 
@@ -7,14 +7,19 @@ class IngredientBase(BaseModel):
     name: str
 
     # ── Core Macros (always present, default 0) ─────────────────────────
-    energy_kcal:    float = 0.0
-    fat:            float = 0.0
-    sat_fat:        float = 0.0
-    carbs:          float = 0.0
-    sugars:         float = 0.0
-    fibre:          float = 0.0
-    protein:        float = 0.0
-    salt:           float = 0.0
+    energy_kcal:    Optional[float] = 0.0
+    fat:            Optional[float] = 0.0
+    sat_fat:        Optional[float] = 0.0
+    carbs:          Optional[float] = 0.0
+    sugars:         Optional[float] = 0.0
+    fibre:          Optional[float] = 0.0
+    protein:        Optional[float] = 0.0
+    salt:           Optional[float] = 0.0
+
+    @field_validator('energy_kcal', 'fat', 'sat_fat', 'carbs', 'sugars', 'fibre', 'protein', 'salt', mode='before')
+    @classmethod
+    def core_none_to_zero(cls, v):
+        return 0.0 if v is None else v
 
     # ── Extended Macros ─────────────────────────────────────────────────
     mono_fat:       Optional[float] = None
