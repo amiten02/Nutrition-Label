@@ -1,0 +1,11 @@
+services:
+  - type: web
+    name: nutrition-label-api
+    runtime: docker
+    dockerfilePath: ./backend/Dockerfile
+    dockerContext: ./backend
+    plan: free
+    healthCheckPath: /
+    envVars:
+      - key: DATABASE_URL
+        value: sqlite:///./nutrition.db
