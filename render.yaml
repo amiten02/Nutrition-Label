@@ -8,4 +8,4 @@ services:
     healthCheckPath: /
     envVars:
       - key: DATABASE_URL
-        value: sqlite:///./nutrition.db
+        sync: false

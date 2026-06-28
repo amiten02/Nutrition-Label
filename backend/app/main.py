@@ -3,7 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy import text
 import uuid
 
-from .database import engine, SessionLocal, Base
+from .database import engine, SessionLocal, Base, _is_sqlite
 from .models import Ingredient
 from .routers import ingredients, recipes
 
@@ -49,8 +49,15 @@ NEW_COLUMNS = [
 def _run_migrations() -> None:
     """Add new columns to an existing ingredients table without losing data."""
     with engine.connect() as conn:
-        result = conn.execute(text("PRAGMA table_info(ingredients)"))
-        existing = {row[1] for row in result.fetchall()}
+        if _is_sqlite:
+            result = conn.execute(text("PRAGMA table_info(ingredients)"))
+            existing = {row[1] for row in result.fetchall()}
+        else:
+            result = conn.execute(text(
+                "SELECT column_name FROM information_schema.columns "
+                "WHERE table_name = 'ingredients'"
+            ))
+            existing = {row[0] for row in result.fetchall()}
         added = []
         for col in NEW_COLUMNS:
             if col not in existing:
